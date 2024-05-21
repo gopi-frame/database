@@ -16,7 +16,7 @@ func NewConnection(db *gorm.DB) *Connection {
 // NewLazyConnection new connection
 func NewLazyConnection(connector func() (*gorm.DB, error)) *Connection {
 	conn := new(Connection)
-	conn.connector = sync.OnceValue[*gorm.DB](func() *gorm.DB {
+	conn.connector = sync.OnceValue(func() *gorm.DB {
 		db, err := connector()
 		if err != nil {
 			panic(err)

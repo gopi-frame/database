@@ -1,0 +1,47 @@
+default = "mysql"
+
+[[connections]]
+name = "sqlite"
+driver = "sqlite"
+database = "database.sqlite"
+prefix = ""
+
+[[connections]]
+name = "mysql"
+driver = "mysql"
+host = "127.0.0.1"
+port = 3306
+database = ""
+prefix = ""
+username = ""
+password = ""
+protocol = "tcp"
+charset = "utf8mb4"
+collation = "utf8mb4_unicode_ci"
+parseTime = true
+location = "Local"
+params.time_zone = "UTC"
+
+[[connections]]
+name = "postgres"
+driver = "postgres"
+host = "127.0.0.1"
+port = 5432
+database = ""
+username = ""
+password = ""
+charset = "utf8"
+prefix = ""
+params.sslmode = "disable"
+params.client_encoding = "utf8"
+
+[[connections]]
+name = "sqlserver"
+driver = "sqlserver"
+host = "127.0.0.1"
+port = 1433
+database = ""
+username = ""
+password = ""
+charset = "utf8"
+prefix = ""
