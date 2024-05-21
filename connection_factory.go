@@ -5,6 +5,8 @@ import (
 
 	"github.com/gopi-frame/exception"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
 	"gorm.io/plugin/dbresolver"
 )
 
@@ -56,7 +58,13 @@ func (c *ConnectionFactory) createReadAndWriteConnection(config ConnectionConfig
 		slaves = append(slaves, c.resolve(readConfig))
 	}
 	return NewLazyConnection(func() (*gorm.DB, error) {
-		db, err := gorm.Open(master)
+		db, err := gorm.Open(master, &gorm.Config{
+			NamingStrategy: schema.NamingStrategy{
+				TablePrefix:   config.Prefix,
+				SingularTable: config.SingularTable,
+			},
+			Logger: logger.Default.LogMode(logger.Error),
+		})
 		if err != nil {
 			return nil, err
 		}
