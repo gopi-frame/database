@@ -1,9 +1,8 @@
 package postgres
 
 import (
+	"fmt"
 	"net/url"
-	"strconv"
-	"strings"
 
 	"github.com/gopi-frame/database"
 	"gorm.io/driver/postgres"
@@ -15,30 +14,29 @@ type Resolver struct{}
 
 // Resolve resolve
 func (r *Resolver) Resolve(cfg database.ConnectionConfig) gorm.Dialector {
-	builder := new(strings.Builder)
-	builder.WriteString("postgres://")
-	builder.WriteString(cfg.Username)
-	if cfg.Password != "" {
-		builder.WriteString(":")
-		builder.WriteString(cfg.Password)
+	dsnURL := url.URL{}
+	dsnURL.Scheme = "postgres"
+	if cfg.Password == "" {
+		dsnURL.User = url.User(cfg.Username)
+	} else {
+		dsnURL.User = url.UserPassword(cfg.Username, cfg.Password)
 	}
-	builder.WriteString(cfg.Host)
-	if cfg.Port > 0 {
-		builder.WriteString(strconv.Itoa(cfg.Port))
+	if cfg.Port != 0 {
+		dsnURL.Host = fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
+	} else {
+		dsnURL.Host = cfg.Host
 	}
-	builder.WriteByte('/')
-	builder.WriteString(cfg.Database)
+	dsnURL.Path = cfg.Database
 	if cfg.Params == nil {
 		cfg.Params = make(map[string]string)
 	}
 	if len(cfg.Params) > 0 {
-		params := make(url.Values)
+		query := make(url.Values)
 		for key, value := range cfg.Params {
-			params.Set(key, value)
+			query.Set(key, value)
 		}
-		builder.WriteByte('?')
-		builder.WriteString(params.Encode())
+		dsnURL.RawQuery = query.Encode()
 	}
-	dsn := builder.String()
+	dsn := dsnURL.String()
 	return postgres.Open(dsn)
 }

@@ -14,20 +14,27 @@ type Resolver struct{}
 
 // Resolve resolve
 func (r *Resolver) Resolve(cfg database.ConnectionConfig) gorm.Dialector {
-	dsn := fmt.Sprintf("sqlserver://%s:%s@%s:%d",
-		cfg.Username,
-		cfg.Password,
-		cfg.Host,
-		cfg.Port,
-	)
+	dsnURL := url.URL{}
+	dsnURL.Scheme = "sqlserver"
+	if cfg.Password != "" {
+		dsnURL.User = url.UserPassword(cfg.Username, cfg.Password)
+	} else {
+		dsnURL.User = url.User(cfg.Username)
+	}
+	if cfg.Port != 0 {
+		dsnURL.Host = fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
+	} else {
+		dsnURL.Host = cfg.Host
+	}
 	if cfg.Params == nil {
 		cfg.Params = make(map[string]string)
 	}
 	cfg.Params["database"] = cfg.Database
-	params := make(url.Values)
+	query := make(url.Values)
 	for key, value := range cfg.Params {
-		params.Set(key, value)
+		query.Set(key, value)
 	}
-	dsn = fmt.Sprintf("%s?%s", dsn, params.Encode())
+	dsnURL.RawQuery = query.Encode()
+	dsn := dsnURL.String()
 	return sqlserver.Open(dsn)
 }
