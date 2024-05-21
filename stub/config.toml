@@ -1,5 +1,8 @@
+# default connection name
 default = "mysql"
 
+# database connections
+#  avaliable drivers: "sqlite", "mysql", "postgres", "sqlserver"
 [[connections]]
 name = "sqlite"
 driver = "sqlite"
