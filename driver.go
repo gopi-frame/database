@@ -4,14 +4,14 @@ import (
 	"fmt"
 
 	"github.com/gopi-frame/collection/kv"
-	"github.com/gopi-frame/database/driver"
+	"github.com/gopi-frame/contract/database"
 	"github.com/gopi-frame/exception"
 	"gorm.io/gorm"
 )
 
-var drivers = kv.NewMap[string, driver.Driver]()
+var drivers = kv.NewMap[string, database.Driver]()
 
-func Register(driverName string, driver driver.Driver) {
+func Register(driverName string, driver database.Driver) {
 	drivers.Lock()
 	defer drivers.Unlock()
 	if _, dup := drivers.Get(driverName); dup {

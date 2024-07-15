@@ -1,8 +1,8 @@
 package mysql
 
 import (
+	"github.com/go-viper/mapstructure/v2"
 	"github.com/gopi-frame/database"
-	"github.com/mitchellh/mapstructure"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )

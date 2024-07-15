@@ -1,4 +1,4 @@
-package logger
+package database
 
 import (
 	"context"
@@ -6,19 +6,19 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gopi-frame/logger/driver"
+	"github.com/gopi-frame/contract/logger"
 	"gorm.io/gorm"
 	gormlogger "gorm.io/gorm/logger"
 )
 
 type Logger struct {
-	logger                    driver.Logger
+	logger                    logger.Logger
 	Level                     gormlogger.LogLevel
 	IgnoreRecordNotFoundError bool
 	SlowThreshold             time.Duration
 }
 
-func New(logger driver.Logger) *Logger {
+func New(logger logger.Logger) *Logger {
 	return &Logger{
 		logger:                    logger,
 		Level:                     gormlogger.Warn,
