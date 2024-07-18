@@ -5,7 +5,7 @@ import (
 
 	"github.com/gopi-frame/database"
 	"github.com/gopi-frame/exception"
-	"github.com/gopi-frame/utils/kv"
+	"github.com/gopi-frame/util/kv"
 	"gorm.io/driver/sqlserver"
 	"gorm.io/gorm"
 )
