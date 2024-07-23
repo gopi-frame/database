@@ -3,6 +3,7 @@ package database
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/gopi-frame/collection/kv"
 	"github.com/gopi-frame/contract/database"
@@ -42,4 +43,13 @@ func Connect(driverName string, options map[string]any, gormOpts ...gorm.Option)
 		return nil, err
 	}
 	return gorm.Open(d, gormOpts...)
+}
+
+// Drivers returns a list of registered database drivers.
+func Drivers() []string {
+	drivers.RLock()
+	defer drivers.RUnlock()
+	list := drivers.Keys()
+	sort.Strings(list)
+	return list
 }
