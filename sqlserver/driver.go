@@ -1,36 +1,33 @@
+// Package sqlserver provides sqlserver database driver.
 package sqlserver
 
 import (
-	"strings"
-
+	"github.com/go-viper/mapstructure/v2"
 	"github.com/gopi-frame/database"
-	"github.com/gopi-frame/exception"
-	"github.com/gopi-frame/util/kv"
 	"gorm.io/driver/sqlserver"
 	"gorm.io/gorm"
 )
 
+// This variable can be replaced through `go build -ldflags=-X github.com/gopi-frame/database/sqlserver.driverName=custom`
 var driverName = "sqlserver"
 
+//goland:noinspection GoBoolExpressions
 func init() {
 	if driverName != "" {
 		database.Register(driverName, new(Driver))
 	}
 }
 
+// Driver is a sqlserver database driver.
 type Driver struct{}
 
+// Open opens a sqlserver database connector.
+// For more information on the options, see [sqlserver.Config](https://pkg.go.dev/gorm.io/driver/sqlserver#Config).
 func (Driver) Open(options map[string]any) (gorm.Dialector, error) {
-	config := sqlserver.Config{}
-	dsn, err := kv.GetE[string](options, OptKeyDSN)
+	var config sqlserver.Config
+	err := mapstructure.WeakDecode(options, config)
 	if err != nil {
 		return nil, err
 	}
-	if strings.TrimSpace(dsn) == "" {
-		return nil, exception.New("dsn can't be empty")
-	}
-	config.DSN = dsn
-	defaultStringSize := kv.Get[int](options, OptKeyDefaultStringSize)
-	config.DefaultStringSize = defaultStringSize
 	return sqlserver.New(config), nil
 }

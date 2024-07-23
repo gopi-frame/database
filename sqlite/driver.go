@@ -1,32 +1,33 @@
+// Package sqlite provides sqlite database driver.
 package sqlite
 
 import (
-	"strings"
-
+	"github.com/go-viper/mapstructure/v2"
 	"github.com/gopi-frame/database"
-	"github.com/gopi-frame/exception"
-	"github.com/gopi-frame/util/kv"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
+// This variable can be replaced through `go build -ldflags=-X github.com/gopi-frame/database/sqlite.driverName=custom`
 var driverName = "sqlite"
 
+//goland:noinspection GoBoolExpressions
 func init() {
 	if driverName != "" {
 		database.Register(driverName, new(Driver))
 	}
 }
 
+// Driver is a sqlite database driver.
 type Driver struct{}
 
+// Open opens a sqlite database connector.
+// For more information on the options, see [sqlite.Config](https://pkg.go.dev/gorm.io/driver/sqlite#Config).
 func (Driver) Open(options map[string]any) (gorm.Dialector, error) {
-	dsn, err := kv.GetE[string](options, OptKeyDSN)
+	var config sqlite.Config
+	err := mapstructure.WeakDecode(options, &config)
 	if err != nil {
 		return nil, err
 	}
-	if strings.TrimSpace(dsn) == "" {
-		return nil, exception.New("dsn can't be empty")
-	}
-	return sqlite.Open(dsn), nil
+	return sqlite.New(config), nil
 }

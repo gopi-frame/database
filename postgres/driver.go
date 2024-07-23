@@ -1,36 +1,33 @@
+// Package postgres provides postgres database driver.
 package postgres
 
 import (
-	"strings"
-
+	"github.com/go-viper/mapstructure/v2"
 	"github.com/gopi-frame/database"
-	"github.com/gopi-frame/exception"
-	"github.com/gopi-frame/util/kv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
+// This variable can be replaced through `go build -ldflags=-X github.com/gopi-frame/database/postgres.driverName=custom`
 var driverName = "postgres"
 
+//goland:noinspection GoBoolExpressions
 func init() {
 	if driverName != "" {
 		database.Register(driverName, new(Driver))
 	}
 }
 
+// Driver is a postgres database driver.
 type Driver struct{}
 
+// Open opens a postgres database connector.
+// For more information on the options, see [postgres.Config](https://pkg.go.dev/gorm.io/driver/postgres#Config).
 func (Driver) Open(options map[string]any) (gorm.Dialector, error) {
-	config := postgres.Config{}
-	dsn, err := kv.GetE[string](options, OptKeyDSN)
+	var config postgres.Config
+	err := mapstructure.WeakDecode(options, &config)
 	if err != nil {
 		return nil, err
 	}
-	if strings.TrimSpace(dsn) == "" {
-		return nil, exception.New("dsn can't be empty")
-	}
-	config.WithoutQuotingCheck = kv.Get[bool](options, OptKeyWithoutQuatingCheck)
-	config.PreferSimpleProtocol = kv.Get[bool](options, OptKeyPreferSimpleProtocol)
-	config.WithoutReturning = kv.Get[bool](options, OptKeyWithoutReturning)
 	return postgres.New(config), nil
 }
