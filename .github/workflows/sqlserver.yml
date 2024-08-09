@@ -1,0 +1,39 @@
+name: Test driver sqlserver
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: [ "1.22" ]
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        env:
+          ACCEPT_EULA: Y
+          SA_PASSWORD: "123456"
+        ports:
+          - 1433:1433
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Test driver sqlserver
+        working-directory: ./driver/sqlserver
+        run: |
+          go mod tidy
+          go test -v -coverprofile=coverage.out ./...
+      - name: Upload driver sqlserver coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./driver/sqlserver/coverage.out
+          fail_ci_if_error: true
+          verbose: true
+          flags: sqlserver
+          codecov_yml_path: ./.codecov.yml

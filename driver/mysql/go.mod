@@ -1,4 +1,4 @@
-module github.com/gopi-frame/database/mysql
+module github.com/gopi-frame/database/driver/mysql
 
 go 1.22.2
 

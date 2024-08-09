@@ -1,4 +1,4 @@
-module github.com/gopi-frame/database/sqlite
+module github.com/gopi-frame/database/driver/sqlite
 
 go 1.22.2
 

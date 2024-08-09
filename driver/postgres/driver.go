@@ -31,3 +31,8 @@ func (Driver) Open(options map[string]any) (gorm.Dialector, error) {
 	}
 	return postgres.New(config), nil
 }
+
+// Open is a convenience function that calls [Driver.Open].
+func Open(options map[string]any) (gorm.Dialector, error) {
+	return new(Driver).Open(options)
+}

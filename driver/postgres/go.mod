@@ -1,4 +1,4 @@
-module github.com/gopi-frame/database/postgres
+module github.com/gopi-frame/database/driver/postgres
 
 go 1.22.2
 

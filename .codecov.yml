@@ -1,0 +1,42 @@
+codecov:
+  require_ci_to_pass: true
+  notify:
+    wait_for_ci: true
+    after_n_builds: 4
+coverage:
+  precision: 2
+  round: down
+  status:
+    project:
+      default:
+        target: 90%
+        threshold: 1%
+    patch:
+      default:
+        target: 90%
+        threshold: 1%
+comment:
+  layout: "diff, flags, files"
+  behavior: default
+  require_changes: false
+flags:
+  database:
+    carryforward: true
+    paths:
+      - "./*"
+  mysql:
+    carryforward: true
+    paths:
+      - "./driver/mysql/*"
+  sqlite:
+    carryforward: true
+    paths:
+      - "./driver/sqlite/*"
+  postgres:
+    carryforward: true
+    paths:
+      - "./driver/postgres/*"
+  sqlserver:
+    carryforward: true
+    paths:
+      - "./driver/sqlserver/*"

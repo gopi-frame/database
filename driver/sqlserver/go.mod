@@ -1,4 +1,4 @@
-module github.com/gopi-frame/database/sqlserver
+module github.com/gopi-frame/database/driver/sqlserver
 
 go 1.22.2
 

@@ -44,7 +44,7 @@ func main() {
 - [postgres](postgres/README.md)
 - [sqlserver](sqlserver/README.md)
 
-## Custom Drivers
+## How to create a custom driver
 
 To create a custom driver, just implement
 the [database.Driver](https://pkg.go.dev/github.com/gopi-frame/contract/database#Driver) interface
