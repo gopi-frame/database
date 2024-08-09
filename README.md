@@ -1,5 +1,11 @@
 # Database
-Package database is a package for managing database drivers.
+[![Go Reference](https://pkg.go.dev/badge/github.com/gopi-frame/database.svg)](https://pkg.go.dev/github.com/gopi-frame/database)
+[![Go](https://github.com/gopi-frame/database/actions/workflows/go.yml/badge.svg)](https://github.com/gopi-frame/database/actions/workflows/go.yml)
+[![codecov](https://codecov.io/gh/gopi-frame/database/graph/badge.svg?token=N2LZNDNDCT&flag=database)](https://codecov.io/gh/gopi-frame/database?flags[0]=database)
+[![Go Report Card](https://goreportcard.com/badge/github.com/gopi-frame/database)](https://goreportcard.com/report/github.com/gopi-frame/database)
+[![Mit License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+
+Package database provides a database abstraction client.
 
 This package is based on [gorm](https://github.com/go-gorm/gorm)
 
@@ -28,7 +34,7 @@ import (
 )
 
 func main() {
-    db, err := database.Open("sqlite", map[string]any{
+    db, err := database.Connect("sqlite", map[string]any{
         "dsn": "file:test.db",
     })
     if err!= nil {
@@ -39,10 +45,10 @@ func main() {
 
 ## Drivers
 
-- [sqlite](sqlite/README.md)
-- [mysql](mysql/README.md)
-- [postgres](postgres/README.md)
-- [sqlserver](sqlserver/README.md)
+- [sqlite](./driver/sqlite/README.md)
+- [mysql](./driver/mysql/README.md)
+- [postgres](./driver/postgres/README.md)
+- [sqlserver](./driver/sqlserver/README.md)
 
 ## How to create a custom driver
 
