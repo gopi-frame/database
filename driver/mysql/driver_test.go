@@ -9,7 +9,7 @@ import (
 func TestOpen(t *testing.T) {
 	t.Run("valid options", func(t *testing.T) {
 		var options = map[string]any{
-			"dsn": "root@tcp(127.0.0.1:3306)/test?parseTime=true&charset=utf8mb4&collation=utf8mb4_unicode_ci",
+			"dsn": "root@tcp(127.0.0.1:3306)/?parseTime=true&charset=utf8mb4&collation=utf8mb4_unicode_ci",
 		}
 		dialector, err := Open(options)
 		if err != nil {
