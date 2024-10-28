@@ -2,7 +2,6 @@
 package database
 
 import (
-	"fmt"
 	"sort"
 
 	"github.com/gopi-frame/collection/kv"
@@ -22,7 +21,7 @@ func Register(driverName string, driver database.Driver) {
 		panic(exception.NewEmptyArgumentException("driver"))
 	}
 	if _, dup := drivers.Get(driverName); dup {
-		panic(exception.NewArgumentException("driverName", driverName, fmt.Sprintf("duplicate driver \"%s\"", driverName)))
+		panic(NewDuplicateDriverException(driverName))
 	}
 	drivers.Set(driverName, driver)
 }
@@ -34,18 +33,20 @@ func Open(driverName string, options map[string]any) (gorm.Dialector, error) {
 	driver, ok := drivers.Get(driverName)
 	drivers.RUnlock()
 	if !ok {
-		return nil, exception.NewArgumentException("driverName", driverName, fmt.Sprintf("Unknown driver \"%s\"", driverName))
+		return nil, NewUnregisteredDriverException(driverName)
 	}
 	return driver.Open(options)
 }
 
 // Connect connects to a database using the given driver name and options.
-func Connect(driverName string, options map[string]any, gormOpts ...gorm.Option) (*gorm.DB, error) {
-	d, err := Open(driverName, options)
-	if err != nil {
-		return nil, err
+func Connect(driverName string, options map[string]any) (*gorm.DB, error) {
+	drivers.RLock()
+	defer drivers.RUnlock()
+	driver, ok := drivers.Get(driverName)
+	if !ok {
+		return nil, NewUnregisteredDriverException(driverName)
 	}
-	return gorm.Open(d, gormOpts...)
+	return driver.Connect(options)
 }
 
 // Drivers returns a list of registered database drivers.

@@ -2,44 +2,19 @@ package mysql
 
 import (
 	"github.com/stretchr/testify/assert"
-	"gorm.io/gorm"
 	"testing"
 )
 
-func TestOpen(t *testing.T) {
-	t.Run("valid options", func(t *testing.T) {
-		var options = map[string]any{
-			"dsn": "root@tcp(127.0.0.1:3306)/?parseTime=true&charset=utf8mb4&collation=utf8mb4_unicode_ci",
-		}
-		dialector, err := Open(options)
-		if err != nil {
-			assert.FailNow(t, err.Error())
-		} else {
-			assert.NotNil(t, dialector)
-			db, err := gorm.Open(dialector)
-			assert.Nil(t, err)
-			assert.NotNil(t, db)
-		}
-	})
-
-	t.Run("invalid options", func(t *testing.T) {
-		var options = map[string]any{
-			"dsn": map[string]string{
-				"key": "invalid",
-			},
-		}
-		dialector, err := Open(options)
-		assert.NotNil(t, err)
-		assert.Nil(t, dialector)
-	})
-}
-
-func TestConnect(t *testing.T) {
+func TestConnector_Connect(t *testing.T) {
 	t.Run("single", func(t *testing.T) {
 		var config = map[string]any{
 			"dsn": "root@tcp(127.0.0.1:3306)/gopi?charset=utf8mb4&parseTime=true&loc=Local",
 		}
-		_, err := Connect(config)
+		c, err := NewConnector(config)
+		if err != nil {
+			assert.FailNow(t, err.Error())
+		}
+		_, err = c.Connect()
 		if err != nil {
 			assert.FailNow(t, err.Error())
 		}
@@ -55,11 +30,15 @@ func TestConnect(t *testing.T) {
 				},
 			},
 		}
-		db, err := Connect(config)
+		c, err := NewConnector(config)
 		if err != nil {
 			assert.FailNow(t, err.Error())
 		}
-		assert.NotNil(t, db.Plugins["gorm:db_resolver"])
+		assert.Equal(t, 1, len(c.Replicas))
+		_, err = c.Connect()
+		if err != nil {
+			assert.FailNow(t, err.Error())
+		}
 	})
 
 	t.Run("with gorm_options", func(t *testing.T) {
@@ -71,7 +50,11 @@ func TestConnect(t *testing.T) {
 				},
 			},
 		}
-		db, err := Connect(config)
+		c, err := NewConnector(config)
+		if err != nil {
+			assert.FailNow(t, err.Error())
+		}
+		db, err := c.Connect()
 		if err != nil {
 			assert.FailNow(t, err.Error())
 		}

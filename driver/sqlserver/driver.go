@@ -2,9 +2,7 @@
 package sqlserver
 
 import (
-	"github.com/go-viper/mapstructure/v2"
 	"github.com/gopi-frame/database"
-	"gorm.io/driver/sqlserver"
 	"gorm.io/gorm"
 )
 
@@ -24,15 +22,26 @@ type Driver struct{}
 // Open opens a sqlserver database connector.
 // For more information on the options, see [sqlserver.Config](https://pkg.go.dev/gorm.io/driver/sqlserver#Config).
 func (Driver) Open(options map[string]any) (gorm.Dialector, error) {
-	var config sqlserver.Config
-	err := mapstructure.WeakDecode(options, config)
+	connector, err := NewConnector(options)
 	if err != nil {
 		return nil, err
 	}
-	return sqlserver.New(config), nil
+	return connector.Open(), nil
+}
+
+func (Driver) Connect(options map[string]any) (*gorm.DB, error) {
+	connector, err := NewConnector(options)
+	if err != nil {
+		return nil, err
+	}
+	return connector.Connect()
 }
 
 // Open is a convenience function that calls [Driver.Open].
 func Open(options map[string]any) (gorm.Dialector, error) {
 	return new(Driver).Open(options)
+}
+
+func Connect(options map[string]any) (*gorm.DB, error) {
+	return new(Driver).Connect(options)
 }
