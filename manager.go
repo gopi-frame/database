@@ -1,11 +1,14 @@
 package database
 
 import (
+	"sync"
+
 	"github.com/gopi-frame/collection/kv"
 	"gorm.io/gorm"
 )
 
 type DatabaseManager struct {
+	once sync.Once
 	*gorm.DB
 
 	defaultConnection string
@@ -13,7 +16,7 @@ type DatabaseManager struct {
 	lazyConnections   *kv.Map[string, func() (*gorm.DB, error)]
 }
 
-func NewManager() *DatabaseManager {
+func NewDatabaseManager() *DatabaseManager {
 	return &DatabaseManager{
 		connections:     kv.NewMap[string, *gorm.DB](),
 		lazyConnections: kv.NewMap[string, func() (*gorm.DB, error)](),
@@ -22,11 +25,9 @@ func NewManager() *DatabaseManager {
 
 func (m *DatabaseManager) SetDefaultConnection(connection string) {
 	m.defaultConnection = connection
-}
-
-func (m *DatabaseManager) Use(db *gorm.DB) *DatabaseManager {
-	m.DB = db
-	return m
+	m.once.Do(func() {
+		m.DB = m.GetConnection(connection)
+	})
 }
 
 func (m *DatabaseManager) AddConnection(name string, db *gorm.DB) {
@@ -35,7 +36,7 @@ func (m *DatabaseManager) AddConnection(name string, db *gorm.DB) {
 	m.connections.Set(name, db)
 }
 
-func (m *DatabaseManager) AddLazyConnection(name string, config map[string]any) {
+func (m *DatabaseManager) AddDeferConnection(name string, config map[string]any) {
 	m.lazyConnections.Lock()
 	defer m.lazyConnections.Unlock()
 	m.lazyConnections.Set(name, func() (*gorm.DB, error) {
@@ -60,7 +61,7 @@ func (m *DatabaseManager) HasConnection(name string) bool {
 	return false
 }
 
-func (m *DatabaseManager) Connection(name string) *gorm.DB {
+func (m *DatabaseManager) GetConnection(name string) *gorm.DB {
 	m.connections.RLock()
 	if conn, ok := m.connections.Get(name); ok {
 		m.connections.RUnlock()
