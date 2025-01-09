@@ -2,14 +2,16 @@ package postgres
 
 import (
 	"bytes"
-	"github.com/go-viper/mapstructure/v2"
-	"github.com/gopi-frame/database"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-	"gorm.io/plugin/dbresolver"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/go-viper/mapstructure/v2"
+	"github.com/gopi-frame/database"
+	"github.com/gopi-frame/env"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/plugin/dbresolver"
 )
 
 type Connector struct {
@@ -74,9 +76,9 @@ func NewConnector(config map[string]any) (*Connector, error) {
 				strings.EqualFold(fieldName, strings.ReplaceAll(mapKey, "_", ""))
 		},
 		DecodeHook: mapstructure.ComposeDecodeHookFunc(
-			database.ExpandStringWithEnvHookFunc(),
-			database.ExpandSliceWithEnvHookFunc(),
-			database.ExpandStringKeyMapWithEnvHookFunc(),
+			env.ExpandStringWithEnvHookFunc(),
+			env.ExpandSliceWithEnvHookFunc(),
+			env.ExpandStringKeyMapWithEnvHookFunc(),
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToBasicTypeHookFunc(),
 			mapstructure.StringToSliceHookFunc(","),

@@ -2,13 +2,15 @@ package sqlite
 
 import (
 	"bytes"
+	"net/url"
+	"strings"
+
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/gopi-frame/database"
+	"github.com/gopi-frame/env"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/plugin/dbresolver"
-	"net/url"
-	"strings"
 )
 
 type Connector struct {
@@ -29,9 +31,9 @@ func NewConnector(config map[string]any) (*Connector, error) {
 				strings.EqualFold(fieldName, strings.ReplaceAll(mapKey, "_", ""))
 		},
 		DecodeHook: mapstructure.ComposeDecodeHookFunc(
-			database.ExpandStringWithEnvHookFunc(),
-			database.ExpandSliceWithEnvHookFunc(),
-			database.ExpandStringKeyMapWithEnvHookFunc(),
+			env.ExpandStringWithEnvHookFunc(),
+			env.ExpandSliceWithEnvHookFunc(),
+			env.ExpandStringKeyMapWithEnvHookFunc(),
 			mapstructure.StringToBasicTypeHookFunc(),
 			database.NamingStrategyParseHookFunc(),
 		),
